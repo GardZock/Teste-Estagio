@@ -6,6 +6,14 @@
     width: 20px;
 }
 
+.check {
+    width: 150px;
+}
+
 .to_white {
     filter: invert(93%) sepia(82%) saturate(2%) hue-rotate(241deg) brightness(104%) contrast(101%);
+}
+
+.to_green {
+    filter: invert(17%) sepia(100%) saturate(4948%) hue-rotate(117deg) brightness(98%) contrast(106%);
 }

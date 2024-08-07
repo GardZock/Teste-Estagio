@@ -1,59 +1,40 @@
-let productCount = 0;
-let attachmentCount = 0;
-
+let productIDS = [];
+let attachmentIDS = [];
 
 const isValid = {
     cnpj: (cnpj) => {
-        console.log(cnpj)
-        cnpj = cnpj.replace(/^\d+$/, '');
+        if (!cnpj) return false;
+        cnpj = cnpj.replace(/[^\d]/g, '');
 
         if (cnpj.length !== 14) return false;
-
         if (/^(\d)\1{13}$/.test(cnpj)) return false;
-
-        let length = cnpj.length - 2;
-        let digits = cnpj.slice(-2);
-        let sum = 0;
-        let pos = length - 7;
-
-        for (let i = length; i >= 0; i--) {
-            sum += cnpj[i] * pos--;
-            if (pos < 2) pos = 9;
-        }
-
-        let result = sum % 11 < 2 ? 0 : 11 - sum % 11;
-        if (result != digits[0]) return false;
-
-        length += 1;
-        sum = 0;
-        pos = length - 7;
-
-        for (let i = length; i >= 0; i--) {
-            sum += cnpj[i] * pos--;
-            if (pos < 2) pos = 9;
-        }
-
-        result = sum % 11 < 2 ? 0 : 11 - sum % 11;
-        if (result != digits[1]) return false;
 
         return true;
     },
     cep: (cep) => {
-        cep = cep.replace(/^\d+$/, '');
-            if (cep.length !== 8) return false;
-            if (/^(\d)\1{7}$/.test(cep)) return false;
+        if (!cep) return false;
+        cep = cep.replace(/[^\d]/g, '');
+        if (cep.length !== 8) return false;
+        if (/^(\d)\1{7}$/.test(cep)) return false;
 
-            return true;
+        return true;
     },
     phone: (phone) => {
-        phone = phone.replace(/^\d+$/, '');
+        if (!phone) return false;
+        phone = phone.replace(/[^\d]/g, '');
 
-        if (phone.length !== 10 && phone.length !== 11) return false;
-        if (/^(\d)\1{9,10}$/.test(phone)) return false;
+        if (!/^\+?\d{1,3} ?\(?\d{2}\)? ?\d{5}-?\d{4}$/.test(phone)) return false;
+        return true;
+    },
+    email: (email) => {
+        if (!email) return false;
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return false;
+        return true;
     }
 }
 
 $(document).ready(function () {
+    sessionStorage.clear();
     $('#cep').on('blur', function () {
         var cep = $(this).val().replace(/\D/g, '');
         if (cep != "") {
@@ -82,20 +63,14 @@ $(document).ready(function () {
         }
     });
 
-    function clearForm() {
-        $('#address').val('');
-        $('#dist').val('');
-        $('#city').val('');
-        $('#state').val('');
-    }
-
     $('#addProductButton').click(function () {
-        productCount++;
+        const id = productIDS.length > 0 ? productIDS.length + 1 : 0
+        productIDS.push(id)
         const productHTML = `
-            <li id="product${productCount}">
+            <li id="product${id}">
                 <div class="container-fluid d-flex">
                     <div class="d-flex align-items-center">
-                        <button type="button" class="btn btn-danger border border-2 border-black" onclick="removeProduct(${productCount})">
+                        <button type="button" class="btn btn-danger border border-2 border-black" onclick="removeProduct(${id})">
                             <img src="assets/images/trash.svg" alt="trash icon" class="icon to_white">
                         </button>
                     </div>
@@ -106,15 +81,15 @@ $(document).ready(function () {
                         <div class="w-100 mx-4">
                             <div class="w-100">
                                 <div class="form-group">
-                                    <label for="product_name${productCount}">Produto</label>
+                                    <label for="product_name${id}">Produto</label>
                                     <div>
-                                        <input type="text" class="form-control" id="product_name${productCount}" name="product_name${productCount}" required>
+                                        <input type="text" class="form-control" id="product_name${id}" name="product_name${id}" required>
                                     </div>
                                 </div>
                                 <div class="w-100 d-flex gap-3">
                                     <div class="form-group w-25">
-                                        <label for="UnSize${productCount}">UND. Medida</label>
-                                        <select class="form-select" id="UnSize" name="UnSize">
+                                        <label for="UnSize${id}">UND. Medida</label>
+                                        <select class="form-select" id="UnSize${id}" name="UnSize">
                                             <option value="kg">Quilograma (kg)</option>
                                             <option value="g">Grama (g)</option>
                                             <option value="l">Litro (l)</option>
@@ -126,21 +101,21 @@ $(document).ready(function () {
                                         </select>
                                     </div>
                                     <div class="form-group w-25">
-                                        <label for="stock${productCount}">QTD. em Estoque</label>
+                                        <label for="stock${id}">QTD. em Estoque</label>
                                         <div>
-                                            <input type="number" class="form-control" id="stock${productCount}" name="stock${productCount}" onchange="updateProduct(${productCount})" required>
+                                            <input type="number" class="form-control" id="stock${id}" name="stock${id}" onchange="updateProductValues(${id})" required>
                                         </div>
                                     </div>
                                     <div class="form-group w-25">
-                                        <label for="unValor${productCount}">Valor Unitário</label>
+                                        <label for="unValor${id}">Valor Unitário</label>
                                         <div>
-                                            <input type="number" class="form-control" id="unValor${productCount}" name="unValor${productCount}" onchange="updateProduct(${productCount})" required>
+                                            <input type="number" class="form-control" id="unValor${id}" name="unValor${id}" onchange="updateProductValues(${id})" required>
                                         </div>
                                     </div>
                                     <div class="form-group w-25">
-                                        <label for="totalValue${productCount}">Valor Total</label>
+                                        <label for="totalValue${id}">Valor Total</label>
                                         <div>
-                                            <input type="number" class="form-control" id="totalValue${productCount}" name="totalValue${productCount}" disabled>
+                                            <input type="number" class="form-control" id="totalValue${id}" name="totalValue${id}" disabled>
                                         </div>
                                     </div>
                                 </div>
@@ -154,63 +129,92 @@ $(document).ready(function () {
     });
 
     $('#addAttachmentButton').click(function () {
-        attachmentCount++;
+        const id = attachmentIDS.length > 0 ? attachmentIDS.length : 0
+        attachmentIDS.push(id)
         const attachmentHTML = `
-            <div class="border border-2 border-black rounded p-3 d-flex mb-2" id="attachment${attachmentCount}">
-                <div class="d-flex align-items-center gap-2">
-                    <button type="button" class="btn btn-danger border border-2 border-black" onclick="removeAttachment(${attachmentCount})">
-                        <img src="assets/images/trash.svg" alt="trash icon" class="icon to_white">
-                    </button>
-                    <button type="button" class="btn btn-info" id="viewAttachment${attachmentCount}">
-                        <img src="assets/images/eye.svg" alt="eye icon" class="icon to_white">
-                    </button>
-                </div>
-                <div class="mx-5 align-items-center d-flex pt-2">
-                    <input type="file" class="form-control" id="fileInput${attachmentCount}" style="display: none;" onchange="updateAttachmentName(${attachmentCount})">
-                    <p class="fw-bolder fs-5" id="fileName${attachmentCount}">Selecionar arquivo</p>
+            <div style="display: none;" id="attachment${id}">
+                <div class="border border-2 border-black rounded p-3 d-flex mb-2">
+                    <div class="d-flex align-items-center gap-2">
+                        <button type="button" class="btn btn-danger border border-2 border-black" onclick="removeAttachment(${id})">
+                            <img src="assets/images/trash.svg" alt="trash icon" class="icon to_white">
+                        </button>
+                        <button type="button" class="btn btn-info" id="viewAttachment${id}">
+                            <img src="assets/images/eye.svg" alt="eye icon" class="icon to_white">
+                        </button>
+                    </div>
+                    <div class="mx-5 align-items-center d-flex pt-2">
+                        <input type="file" class="form-control" id="fileInput${id}" onchange="updateAttachmentName(${id})" style="display: none;">
+                        <p class="fw-bolder fs-5" id="fileName${id}">Selecionar arquivo</p>
+                    </div>
                 </div>
             </div>
         `;
         $('#attachmentsContainer').append(attachmentHTML);
-        $(`#fileInput${attachmentCount}`).click();
+        $(`#fileInput${id}`).click();
     });
 
-    $("#form_forn").on('submit', function (event) {
+    $("#form_forn").on('submit', async function (event) {
         event.preventDefault();
+        const errors = await checkErros(event);
+        if (!errors) return;
 
-        const data = {
-            cep: $("#cep").val(),
-            cnpj: $("#cnpj").val(),
-            phone: $("#phone").val()
-        }
-        
-        let errors = []
-        for(const valids in isValid) {
-            const er = isValid[valids](data[valids])
-            er ? '' : errors.push(`${valids}`)
-        }
-
-        console.log(errors)
-
-        if (errors.length > 0) {
-            for(const err of errors) {
-                $(`#${err}-error`).css('display', 'block');
-            }
-            event.preventDefault();
-        } else {
-            for(const err of errors) {
-                $(`#${err}-error`).hide();
-            }
-        }
-
-        if (productCount < 1 || attachmentCount < 1) {
+        if (productIDS.length < 1 || attachmentIDS.length < 1) {
             alert('É necessário pelo menos 1 produto/anexo para salvar o fornecedor.')
             event.preventDefault()
+            return;
         }
+
+        const products = []
+        for (const id of productIDS) {
+            if (!$(`#product_name${id}`).val()) continue;
+            products.push({
+                indice: id,
+                descricaoProduto: $(`#product_name${id}`).val(),
+                unidadeMedida: $(`#UnSize${id}`).val(),
+                qtdeEstoque: $(`#stock${id}`).val(),
+                valorUnitario: $(`#unValor${id}`).val(),
+                valorTotal: $(`#totalValue${id}`).val()
+            })
+        }
+
+        const annexes = []
+        for (const id of attachmentIDS) {
+            const attachment = JSON.parse(sessionStorage.getItem(`attachment${id}`))
+            if (!attachment) continue;
+            annexes.push({
+                indice: id,
+                nomeArquivo: attachment.name,
+                blobArquivo: base64toBlob(attachment.base64, attachment.fileType)
+            })
+        }
+
+        const data = {
+            razaoSocial: $("#compName").val(),
+            nomeFantasia: $("#fantasyName").val(),
+            cnpj: $("#cnpj").val(),
+            inscricaoEstadual: $("#statIns").val(),
+            inscricaoMunicipal: $("#cityIns").val(),
+            nomeContato: $("#name").val(),
+            telefoneContato: `+${$("#phone").val().replace(/[^\d]/g, '')}`,
+            emailContato: $("#email").val(),
+            produtos: products,
+            anexos: annexes
+        }
+
+        $("#modalContainer").append(`
+            <div>
+            <pre><code id="jsonOutput"></code></pre>
+            </div>
+            `)
+        $('#jsonOutput').text(JSON.stringify(data, null, 2));
+
+        const Modal = new bootstrap.Modal('#loadingModal')
+        Modal.show()
+        console.log(data);
     })
 });
 
-function updateProduct(id) {
+function updateProductValues(id) {
     const stock = $(`#stock${id}`).val()
     const value = $(`#unValor${id}`).val()
     if (stock && value) {
@@ -220,17 +224,38 @@ function updateProduct(id) {
 
 function removeProduct(id) {
     $(`#product${id}`).remove();
+    const index = productIDS.indexOf(id)
+    productIDS.splice(index, 1)
 }
 
 function removeAttachment(id) {
     $(`#attachment${id}`).remove();
+    sessionStorage.removeItem(`attachment${id}`)
+    const index = attachmentIDS.indexOf(id)
+    attachmentIDS.splice(index, 1)
 }
 
-function updateAttachmentName(id) {
+async function updateAttachmentName(id) {
     const fileInput = $(`#fileInput${id}`)[0];
-    const fileName = fileInput.files[0].name;
-    $(`#fileName${id}`).text(fileName);
-    $(`#viewAttachment${id}`).attr('onclick', `downloadAttachment(${id})`);
+    const file = fileInput.files[0];
+
+    if (file) {
+        const base64 = await blobToBase64(file);
+        sessionStorage.setItem(`attachment${id}`, JSON.stringify({
+            name: file.name,
+            base64: base64,
+            fileName: file.name.split('.')[0],
+            fileType: file.type
+        }));
+
+        $(`#fileName${id}`).text(file.name);
+        $(`#viewAttachment${id}`).attr('onclick', `downloadAttachment(${id})`);
+        $(`#attachment${id}`).show();
+    } else {
+        $(`#fileInput${id}`).remove();
+        const index = attachmentIDS.indexOf(id)
+        attachmentIDS.splice(index, 1)
+    }
 }
 
 function downloadAttachment(id) {
@@ -242,4 +267,60 @@ function downloadAttachment(id) {
     link.download = file.name;
     link.click();
     URL.revokeObjectURL(url);
+}
+
+function checkErros(event) {
+    const data = {
+        cep: $("#cep").val(),
+        cnpj: $("#cnpj").val(),
+        phone: $("#phone").val(),
+        email: $("#email").val()
+    }
+
+    let errors = []
+    for (const valids in isValid) {
+        const er = isValid[valids](data[valids])
+        er ? '' : errors.push(`${valids}`)
+    }
+
+    if (errors.length > 0) {
+        for (const err of errors) {
+            $(`#${err}-error`).show();
+        }
+        event.preventDefault();
+        return false;
+    } else {
+        for (const err in data) {
+            $(`#${err}-error`).hide();
+        }
+        return true;
+    }
+}
+
+function clearForm() {
+    $('#address').val('');
+    $('#dist').val('');
+    $('#city').val('');
+    $('#state').val('');
+}
+
+async function blobToBase64(file) {
+    const reader = new FileReader();
+    return new Promise((resolve, reject) => {
+        reader.onload = () => {
+            const base64String = reader.result.split(',')[1];
+            resolve(base64String);
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+    });
+}
+
+function base64toBlob(base64, fileType) {
+    const binary = atob(base64);
+    const array = [];
+    for (let i = 0; i < binary.length; i++) {
+        array.push(binary.charCodeAt(i));
+    }
+    return new Blob([new Uint8Array(array)], { type: fileType });
 }

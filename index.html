@@ -9,6 +9,7 @@
 
         <link rel="stylesheet" type="text/css" href="/css/fluig-style-guide.min.css">
         <link rel="stylesheet" href="css/style.css">
+        <title>Teste Estagiario - Miguel Otavio</title>
     </head>
     <body>
         <main class="fluig-style-guide">
@@ -39,7 +40,7 @@
                                         <label for="cep">CEP</label>
                                         <div>
                                             <input type="text" class="form-control" id="cep" placeholder="00000-000" required>
-                                            <span id="cep-error" class="d-none text-danger">CEP inválido</span>
+                                            <span id="cep-error" class="text-danger" style="display: none;">CEP inválido</span>
                                         </div>
                                     </div>    
                                     <div class="form-group">
@@ -55,7 +56,7 @@
                                             <label for="cnpj">CNPJ</label>
                                             <div>
                                                 <input type="text" class="form-control" id="cnpj" placeholder="00.000.000/0000-00" required>
-                                                <span id="cnpj-error" class="d-none text-danger">CNPJ inválido</span>
+                                                <span id="cnpj-error" class="text-danger" style="display: none;">CNPJ inválido</span>
                                             </div>
                                         </div>
                                     </div>
@@ -75,7 +76,7 @@
                                         <label for="houseNum">Número</label>
                                         <div>
                                             <input type="number" class="form-control" id="houseNum" required>
-                                            <span id="num-error" class="d-none text-danger">Número inválido</span>
+                                            <span id="num-error" class="text-danger" style="display: none;">Número inválido</span>
                                         </div>
                                     </div>
                                 </div>
@@ -92,19 +93,19 @@
                                     <div class="form-group w-100">
                                         <label for="dist">Bairro</label>
                                         <div>
-                                            <input type="text" class="form-control" id="dist">
+                                            <input type="text" class="form-control" id="dist" required>
                                         </div>
                                     </div>
                                     <div class="form-group w-100">
                                         <label for="city">Munícipio</label>
                                         <div>
-                                            <input type="text" class="form-control" id="city">
+                                            <input type="text" class="form-control" id="city" required>
                                         </div>
                                     </div>
                                     <div class="form-group w-100">
                                         <label for="state">Estado</label>
                                         <div>
-                                            <input type="text" class="form-control" id="state">
+                                            <input type="text" class="form-control" id="state" required>
                                         </div>
                                     </div>
                                 </div>
@@ -112,21 +113,21 @@
                                     <div class="form-group w-50">
                                         <label for="name">Nome da Pessoa de Contato</label>
                                         <div>
-                                            <input type="text" class="form-control" id="name">
+                                            <input type="text" class="form-control" id="name" required>
                                         </div>
                                     </div>
                                     <div class="form-group w-25">
                                         <label for="phone">Telefone</label>
                                         <div>
-                                            <input type="tel" class="form-control" id="phone" placeholder="(00) 00000-0000">
-                                            <span id="phone-error" class="d-none text-danger">Telefone inválido</span>
+                                            <input type="tel" class="form-control" id="phone" placeholder="+00 (00) 00000-0000" required>
+                                            <span id="phone-error" class="text-danger" style="display: none;">Telefone inválido</span>
                                         </div>
                                     </div>
                                     <div class="form-group w-25">
                                         <label for="email">E-mail</label>
                                         <div>
-                                            <input type="email" class="form-control" id="email" placeholder="exemplo@exemplo.com">
-                                            <span id="email-error" class="d-none text-danger">Email inválido</span>
+                                            <input type="email" class="form-control" id="email" placeholder="exemplo@exemplo.com" required>
+                                            <span id="email-error" class="text-danger" style="display: none;">Email inválido</span>
                                         </div>
                                     </div>
                                 </div>
@@ -156,10 +157,27 @@
                     </div>
                 </div>
                 <div class="w-100 d-flex my-3">
-                    <button class="btn btn-success w-100">Salvar Forncedor</button>
+                    <button class="btn btn-success w-100" type="submit">Salvar Forncedor</button>
                 </div>
             </form>
+            <div class="modal" id="loadingModal" tabindex="-1" aria-labelledby="loadingModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h1 class="modal-title fs-5" id="loadingModalLabel">Dados do Formulário</h1>
+                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body" id="modalContainer">
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-secondary text-white" data-bs-dismiss="modal">Close</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
         </main>
+        <script src="https://unpkg.com/mustache@latest"></script>
+        <script src="http://style.fluig.com/js/fluig-style-guide.min.js"></script>
         <script src="index.js"></script>
     </body>
 </html>
