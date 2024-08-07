@@ -3,7 +3,7 @@ let attachmentCount = 0;
 
 
 const isValid = {
-    cpnj: (cnpj) => {
+    cnpj: (cnpj) => {
         console.log(cnpj)
         cnpj = cnpj.replace(/^\d+$/, '');
 
@@ -45,7 +45,7 @@ const isValid = {
 
             return true;
     },
-    tel: (phone) => {
+    phone: (phone) => {
         phone = phone.replace(/^\d+$/, '');
 
         if (phone.length !== 10 && phone.length !== 11) return false;
@@ -181,19 +181,20 @@ $(document).ready(function () {
         const data = {
             cep: $("#cep").val(),
             cnpj: $("#cnpj").val(),
-            tel: $("#tel").val()
+            phone: $("#phone").val()
         }
-        console.log(data)
         
         let errors = []
         for(const valids in isValid) {
             const er = isValid[valids](data[valids])
-            er ? erros.push(`${valids}`) : ''
+            er ? '' : errors.push(`${valids}`)
         }
 
-        if (!errors) {
+        console.log(errors)
+
+        if (errors.length > 0) {
             for(const err of errors) {
-                $(`#${err}-error`).show();
+                $(`#${err}-error`).css('display', 'block');
             }
             event.preventDefault();
         } else {
